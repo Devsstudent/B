@@ -1,0 +1,47 @@
+Welcome to a little B compiler :) 
+IDENTIFIER func
+IDENTIFIER a
+??
+IDENTIFIER b
+IDENTIFIER z
+Test z
+IDENTIFIER z
+ID z
+Test z
+IDENTIFIER a
+ID a
+Test a
+IDENTIFIER b
+ID b
+Test b
+PLUS
+Make int const
+Test 
+New definition:  0x602000000fb0
+PLUS
+ASSIGN
+wtf 0x603000008140 0x603000008230
+test 2
+var z 0
+variable existe 0x603000008230
+var z val 2
+var z 2
+output 	.file	"b"
+	.text
+	.globl	func
+	.p2align	4
+	.type	func,@function
+func:
+	.cfi_startproc
+	pushl	%eax
+	.cfi_def_cfa_offset 8
+	movl	$2, (%esp)
+	popl	%eax
+	.cfi_def_cfa_offset 4
+	retl
+.Lfunc_end0:
+	.size	func, .Lfunc_end0-func
+	.cfi_endproc
+
+	.section	".note.GNU-stack","",@progbits
+
