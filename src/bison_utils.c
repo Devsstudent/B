@@ -19,6 +19,22 @@ void yyerror(const char *s) {
     fprintf(stderr, "Erreur: %s\n", s);
 }
 
+//bool	loop_var_list(t_g_var_list **list, void **root, LLVMValueRef *ref, bool (fn)(t_node_var *, void **, LLVMValueRef*)) {
+//	t_g_var_list *buff;
+//
+//	if (!list || !(*list))
+//		return false;
+//	buff = *list;
+//	while (buff) {
+//		if (
+//		if (!fn(buff->var, root, ref)) {
+//			return false;
+//		}
+//		buff = buff->next;
+//	}
+//	return true;
+//}
+
 t_param *add_param(t_param *parameters, char *name) {
     t_param *new = parameters;
 
@@ -74,7 +90,7 @@ t_var_list	**add_node(t_node_var *var, t_var_list **list) {
 	return list;
 }
 
-t_array	*new_arr(int len, t_var_list **list) {
+t_array	*new_arr(int len, t_value_list **list) {
 	t_array *arr = malloc(sizeof(t_array));
 	arr->len = len;
 	arr->values = list;
@@ -83,8 +99,8 @@ t_array	*new_arr(int len, t_var_list **list) {
 }
 
 // Get la taill de la list
-unsigned int getSizeVarList(t_var_list **list) {
-	t_var_list		*buff;
+unsigned int getSizeValList(t_value_list **list) {
+	t_value_list		*buff;
 	unsigned int	len;
 
 	len = 0;
@@ -100,36 +116,44 @@ unsigned int getSizeVarList(t_var_list **list) {
 	return len;
 }
 
-bool	validArrayDeclaration(t_var_list **list, int len/* cmp function */) {
-	unsigned int len_list = getSizeVarList(list);
-	if ((int) len_list > len) {
+bool	validArrayDeclaration(t_value_list **list, int len/* cmp function */) {
+	unsigned int len_list = getSizeValList(list);
+	if ((int) len_list > len && len != -1) {
 		return false;
 	}
 	return true;
 }
 
-static t_val	defineBasicVal(t_const_kind kind) {
+static t_val	defineBasicVal(t_value value) {
 	t_val	init;
 
-	if (kind == CONST_STR) {
-		init = (t_val){.str = NULL};
-	} else if (kind == CONST_INT) {
+	if (value.type == TYPE_STR)  {
+		init = (t_val){.str = ""};
+	} else if (value.type == TYPE_CHAR) {
+		init = (t_val){.c = '\0'};
+	} else if (value.type == TYPE_INT) {
 		init = (t_val){.num = 0};
 	} else {
 		init = (t_val){.ref = NULL};
 	}
+
 	return init;
 }
 
+
+
 void	adaptArraySize(t_array *arr/* cmp function */) {
-	unsigned int len_list = getSizeVarList(arr->values);
-	t_const_kind type = arr->kind;
-	t_val	init = defineBasicVal(type);
-	
+	unsigned int len_list = getSizeValList(arr->values);
+	// Ici elem ca peux etre une variable est dcp on est baisé quoi
+
+	// Loop sur tous les elems pour prend le type et si c'est que des var faut faire une fonction pour LLVMtype to t_value_type
+
+	t_val	init = defineBasicVal((*arr->values)->elem);
+
 	if ((int) len_list < arr->len) {
 		int i = len_list;
-		while (i <= arr->len) {
-			add_node(new_node(NULL, init, (*arr->values)->elem->kind), arr->values);
+		while (i < arr->len) {
+			addToList((t_value){.val=init, .type=(*arr->values)->elem.type}, arr->values);
 			i++;
 		}
 		// Fill avec des zeros le reste
@@ -138,6 +162,28 @@ void	adaptArraySize(t_array *arr/* cmp function */) {
 	}
 }
 
+
+// Ajouter des varibles facilement
+// Utiliser pour les declaratoin auto, extern ou label + pour les params
+//void	add_variable_to_tree(t_node_var *var, t_current_scope *scope) {
+//	// var deja allouer donc on va l'ajouter dans l'arbr
+//	// Le truc c'est qu'il faudrait ajouter aussi la reference de cette variable est l'initialiser
+//	// Create value etc genre ou bien on l'as deja fait avant ? 
+//	tsearch(var, &scope->root_var, compare_var_name);
+//}
+//
+//void	assign_egal(char *varName, t_current_scope *scope, LLVMValueRef toAssign) {
+//	// On repere le nom
+//	t_node_var	*correspondingVar = var_tree_find(&scope->root_tree, varName);
+//	correspondingVar->ref = toAssign;
+//	// Checker si on a trouvé ou pas
+//	// On récupere la ref qui correspond au resultat de l'operation
+//}
+
+/*
+t_val	initRef() {
+
+} */
 
 
 
@@ -161,17 +207,17 @@ void	adaptArraySize(t_array *arr/* cmp function */) {
 //	return true;
 //}
 
-bool	checkElemArrayAllSameType(t_array *arr) {
-	t_var_list *buff = *arr->values;
-	t_const_kind buff_kind = -1;
-	while (buff) {
-		if ((int)buff_kind == -1) {
-			buff_kind = buff->elem->kind;
-		} else if (buff_kind != buff->elem->kind) {
-			return false;
-		}
-		buff = buff->next;
-	}
-	// new len to set !
-	return true;
-}
+//bool	checkElemArrayAllSameType(t_array *arr) {
+//	t_value_list *buff = *arr->values;
+//	t_const_kind buff_kind = -1;
+//	while (buff) {
+//		if ((int)buff_kind == -1) {
+//			buff_kind = buff->elem->kind;
+//		} else if (buff_kind != buff->elem->kind) {
+//			return false;
+//		}
+//		buff = buff->next;
+//	}
+//	// new len to set !
+//	return true;
+//}

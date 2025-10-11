@@ -12,13 +12,19 @@ OBJ= $(addprefix ./obj/, scope.o \
  tsearch.o \
  llvm_utils.o \
  bison_utils.o \
- building.o )
+ building.o \
+ new.o \
+ assignation.o)
 D_LST = $(addprefix obj/, scope.d \
  statement_utils.d \
  tsearch.d \
  llvm_utils.d \
  bison_utils.d \
- building.d)
+ building.d \
+ new.d \
+ assignation.d \
+ $(NAME).d \
+ $(NAME)_flex.d)
 HEADER=-I $(PWD) -I ./include -I/opt/homebrew/opt/llvm/include
 LIB=-L /opt/homebrew/opt/llvm/lib -lLLVM-C
 FLAG=-Wall -Werror -Wextra -g

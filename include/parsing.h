@@ -12,9 +12,11 @@ bool	add_statement_elem(t_statement *statement, t_statement_list *list);
 bool	checkIfVarNameIsParamName(LLVMValueRef function, char *str);
 t_var_list	**add_node(t_node_var *var, t_var_list **list);
 t_param	*add_param(t_param *parameters, char *name);
-t_array	*new_arr(int len, t_var_list **list);
-bool	validArrayDeclaration(t_var_list **list, int len/* cmp function */);
+t_array	*new_arr(int len, t_value_list **list);
+bool	validArrayDeclaration(t_value_list **list, int len/* cmp function */);
 void	adaptArraySize(t_array *arr/* cmp function */);
 bool	checkElemArrayAllSameType(t_array *arr);
+bool	loop_var_list(t_g_var_list **list, void **root, LLVMValueRef *ref, bool (fn)(t_node_var *, void **, LLVMValueRef*));
+unsigned int getSizeValList(t_value_list **list);
 
 #endif
